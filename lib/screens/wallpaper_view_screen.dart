@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 
 class WallpaperViewPage extends StatefulWidget {
   final String image;
+  final String heroId;
 
-  WallpaperViewPage({@required this.image});
+  WallpaperViewPage({@required this.image, @required this.heroId});
 
   @override
   _WallpaperViewPageState createState() => _WallpaperViewPageState();
@@ -21,7 +22,7 @@ class _WallpaperViewPageState extends State<WallpaperViewPage> {
             children: <Widget>[
               Container(
                 child: Hero(
-                  tag: widget.image,
+                  tag: widget.heroId,
                   child: CachedNetworkImage(
                     placeholder: (context, url) => Image(
                       image: AssetImage("assets/placeholder.png"),

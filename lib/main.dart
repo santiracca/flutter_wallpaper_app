@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:wally_app/config/config.dart';
-import 'package:wally_app/config/screens/signin_screen.dart';
+import 'package:wally_app/screens/home_screen.dart';
+import 'package:wally_app/screens/signin_screen.dart';
 
 void main() {
   runApp(App());
@@ -27,10 +29,23 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: SignInScreen(),
+    return StreamBuilder(
+      stream: _auth.onAuthStateChanged,
+      builder: (ctx, AsyncSnapshot<FirebaseUser> snapshot) {
+        if (snapshot.hasData) {
+          FirebaseUser user = snapshot.data;
+          if (user != null) {
+            return HomePage();
+          } else {
+            return SignInScreen();
+          }
+        }
+        return SignInScreen();
+      },
     );
   }
 }

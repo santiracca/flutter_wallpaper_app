@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -12,19 +13,32 @@ class _SignInScreenState extends State<SignInScreen> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  final Firestore _db = Firestore.instance;
+
   void _handleSignIn() async {
-    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+    try {
+      final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
-    final AuthCredential credential = GoogleAuthProvider.getCredential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
 
-    final FirebaseUser user =
-        (await _auth.signInWithCredential(credential)).user;
-    print("signed in " + user.displayName);
+      final FirebaseUser user =
+          (await _auth.signInWithCredential(credential)).user;
+      print("signed in " + user.displayName);
+      _db.collection("users").document(user.uid).setData({
+        "displayName": user.displayName,
+        "email": user.email,
+        "uid": user.uid,
+        "photoUrl": user.photoUrl,
+        "lastSignIn": DateTime.now(),
+      }, merge: true);
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
